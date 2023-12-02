@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         // ye apn is liye kr rahe hai taki agr user logined nai hai to usko login page me direct kr denge
         if(auth.getCurrentUser()==null){
-            Intent intent = new Intent(MainActivity.this, login.class);
+            Intent intent = new Intent(MainActivity.this, signup.class);
             startActivity(intent);
         }
     }

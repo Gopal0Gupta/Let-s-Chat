@@ -45,6 +45,10 @@ public class signup extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
+        auth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
+        database = FirebaseDatabase.getInstance();
+
         login = findViewById(R.id.login);
         Username = findViewById(R.id.username);
         Email = findViewById(R.id.email);
@@ -115,6 +119,8 @@ public class signup extends AppCompatActivity {
                                                         });
                                                     }
                                                 });
+                                            }else{
+
                                             }
                                         }
                                     });
@@ -136,6 +142,8 @@ public class signup extends AppCompatActivity {
                                         }
                                     });
                                 }
+                            }else{
+                                Toast.makeText(signup.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

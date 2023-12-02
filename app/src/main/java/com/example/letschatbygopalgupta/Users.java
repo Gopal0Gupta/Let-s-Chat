@@ -3,7 +3,14 @@ package com.example.letschatbygopalgupta;
 public class Users {
     String profiledp,mail,userName,password,userId,lastMessage,status;
 
-    public Users(String id, String namee, String emaill, String passs, String repasss, String imageUri, String statuss){}
+    public Users(String id, String namee, String emaill, String passs, String repasss, String imageUri, String statuss){
+        this.userId = id;
+        this.userName = namee;
+        this.mail = emaill;
+        this.password = passs;
+        this.profiledp = imageUri;
+        this.status = statuss;
+    }
 
     public String getProfiledp() {
         return profiledp;
