@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,7 +31,7 @@ import com.google.firebase.storage.UploadTask;
 
 public class signup extends AppCompatActivity {
 
-    TextView login;
+    TextView LLogin;
     EditText Username,Email,pass,repass;
     Button signupbtn;
     ImageView img;
@@ -39,32 +41,29 @@ public class signup extends AppCompatActivity {
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     FirebaseDatabase database;
     FirebaseStorage storage;
+    ProgressDialog progressDialog;
 
+
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Establishing The Account");
+        progressDialog.setCancelable(false);
 
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        login = findViewById(R.id.login);
+        LLogin = findViewById(R.id.Login);
         Username = findViewById(R.id.username);
         Email = findViewById(R.id.email);
         pass = findViewById(R.id.password);
         repass = findViewById(R.id.repassword);
         img = findViewById(R.id.profiledp);
         signupbtn = findViewById(R.id.signupbutton);
-
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(signup.this,login.class);
-                startActivity(intent);
-                finish();
-            }
-        });
 
         signupbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,13 +75,17 @@ public class signup extends AppCompatActivity {
                 String statuss = "Hey I'm Using This Application";
 
                 if(TextUtils.isEmpty(namee) || TextUtils.isEmpty(namee) || TextUtils.isEmpty(passs) || TextUtils.isEmpty(repasss)){
+                    progressDialog.dismiss();
                     Toast.makeText(signup.this, "Please Enter Valid Information", Toast.LENGTH_SHORT).show();
                 }
                 else if(!emaill.matches(emailPattern)){
+                    progressDialog.dismiss();
                     Email.setError("Type a valid email");
                 } else if (passs.length()<6) {
+                    progressDialog.dismiss();
                     pass.setError("password must be greater than or equals to six");
                 } else if (!passs.equals(repasss)) {
+                    progressDialog.dismiss();
                     pass.setError("password doesn't match");
                 }
                 else{
@@ -108,6 +111,7 @@ public class signup extends AppCompatActivity {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if(task.isSuccessful()){
+                                                                    progressDialog.show();
                                                                     Intent intent = new Intent(signup.this,MainActivity.class);
                                                                     startActivity(intent);
                                                                     finish();
@@ -132,6 +136,7 @@ public class signup extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
+                                                progressDialog.show();
                                                 Intent intent = new Intent(signup.this,MainActivity.class);
                                                 startActivity(intent);
                                                 finish();
@@ -151,6 +156,15 @@ public class signup extends AppCompatActivity {
             }
         });
 
+        LLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(signup.this, login.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,6 +175,7 @@ public class signup extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

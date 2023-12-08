@@ -3,12 +3,14 @@ package com.example.letschatbygopalgupta;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,11 +24,16 @@ public class login extends AppCompatActivity {
     EditText email,password;
     FirebaseAuth auth;
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+    android.app.ProgressDialog progressDialog;
+    TextView createAct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Please Wait....");
+        progressDialog.setCancelable(false);
 
         auth = FirebaseAuth.getInstance();
 
@@ -41,14 +48,18 @@ public class login extends AppCompatActivity {
                 String pass = password.getText().toString();
 
                 if((TextUtils.isEmpty(Email))){
+                    progressDialog.dismiss();
                     Toast.makeText(login.this, "Enter The Email", Toast.LENGTH_SHORT).show();
                 }
                 else if((TextUtils.isEmpty(pass))){
+                    progressDialog.dismiss();
                     Toast.makeText(login.this, "Enter The Password", Toast.LENGTH_SHORT).show();
                 }
                 else if(!Email.matches(emailPattern)){
+                    progressDialog.dismiss();
                     email.setError("Give Proper Email Address");
                 } else if (password.length()<6) {
+                    progressDialog.dismiss();
                     password.setError("More Then Six Characters");
                     Toast.makeText(login.this, "Password Needs To be Longer Then Six Characters", Toast.LENGTH_SHORT).show();
                 }
@@ -58,6 +69,7 @@ public class login extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
+                                progressDialog.show();
                                 try {
                                     Intent intent = new Intent(login.this, MainActivity.class);
                                     startActivity(intent);
@@ -72,6 +84,14 @@ public class login extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+        createAct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(login.this,signup.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

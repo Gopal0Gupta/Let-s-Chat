@@ -22,6 +22,6 @@ public class Splas_Activity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
-        },3000);
+        },1800);
     }
 }
