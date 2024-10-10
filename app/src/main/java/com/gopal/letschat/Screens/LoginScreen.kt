@@ -8,5 +8,5 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun LoginScreen() {
-    Text(text = "Hello from let's chat", modifier = Modifier.background(Color.Green))
+    Text(text = "Login Screen", modifier = Modifier.background(Color.Green))
 }
