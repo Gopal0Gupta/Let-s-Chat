@@ -6,20 +6,17 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.gopal.letschat.Screens.ChatListScreen
-import com.gopal.letschat.Screens.LoginScreen
-import com.gopal.letschat.Screens.SignUpScreen
+import com.gopal.letschat.screens.ChatListScreen
+import com.gopal.letschat.screens.LoginScreen
+import com.gopal.letschat.screens.SignUpScreen
 import com.gopal.letschat.ui.theme.LetsChatTheme
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 sealed class DestinationScreen(var routes : String){
     object SignUp : DestinationScreen("signup")

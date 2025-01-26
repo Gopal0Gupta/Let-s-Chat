@@ -1,4 +1,4 @@
-package com.gopal.letschat.Screens
+package com.gopal.letschat.screens
 
 import androidx.compose.runtime.Composable
 

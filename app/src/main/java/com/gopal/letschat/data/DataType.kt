@@ -1,6 +1,6 @@
-package com.gopal.letschat.Data
+package com.gopal.letschat.data
 
-data class userData(
+data class UserData(
     var userId: String?="",
     var name: String?="",
     var number: String?="",
