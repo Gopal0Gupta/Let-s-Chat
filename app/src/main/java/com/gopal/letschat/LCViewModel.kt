@@ -39,12 +39,24 @@ class LCViewModel @Inject constructor(
         password: String,
     ){
         inProcess = true
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-            if (it.isSuccessful){
-                signIn = true
-                createOrUpdateProfile(name,number)
+        if(name.isEmpty() or number.isEmpty() or email.isEmpty() or password.isEmpty()){
+            handleException(customMessage = "Please Fill All Fields")
+            return
+        }
+        inProcess = true
+        db.collection(user_node).whereEqualTo("number",number).get().addOnSuccessListener {
+            if(it.isEmpty){
+                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+                    if (it.isSuccessful){
+                        signIn = true
+                        createOrUpdateProfile(name,number)
+                    }else{
+                        handleException(it.exception, customMessage = "Sign Up Failed")
+                    }
+                }
             }else{
-                handleException(it.exception, customMessage = "Sign Up Failed")
+                handleException(customMessage = "Number Already Exists")
+                inProcess = false
             }
         }
     }
@@ -94,7 +106,6 @@ class LCViewModel @Inject constructor(
         exception?.printStackTrace()
         val errormsg = exception?.localizedMessage?:""
         val message = if (customMessage.isNullOrEmpty()) errormsg else customMessage
-
         eventmutablestate = Event(message)
         inProcess = false
     }
