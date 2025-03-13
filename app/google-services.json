@@ -8,25 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:593602938696:android:c62e4ae6bad0b81c8e157d",
-        "android_client_info": {
-          "package_name": "com.example.letschatbygopalgupta"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAsTMZXL3WNdgpA6nAxWGL0cBXePb6r1AE"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:593602938696:android:f67bb04e2c5175068e157d",
         "android_client_info": {
           "package_name": "com.gopal.letschat"

@@ -1,6 +1,7 @@
 package com.gopal.letschat
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,9 +32,14 @@ class LCViewModel @Inject constructor(
             getUserDate(it)
         }
     }
-    fun signUp(name : String, number : String ,email : String, password : String){
+    fun signUp(
+        name: String,
+        number: String,
+        email: String,
+        password: String,
+    ){
         inProcess = true
-        auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful){
                 signIn = true
                 createOrUpdateProfile(name,number)
