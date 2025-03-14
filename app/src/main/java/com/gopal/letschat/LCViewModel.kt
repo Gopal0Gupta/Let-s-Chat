@@ -61,6 +61,26 @@ class LCViewModel @Inject constructor(
         }
     }
 
+    fun logIn(email: String,password: String){
+        if(email.isEmpty() or password.isEmpty()){
+            handleException(customMessage = "Please Fill All Fields")
+            return
+        }else{
+            inProcess = true
+            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
+                if(it.isSuccessful){
+                    signIn = true
+                    inProcess = false
+                    auth.currentUser?.uid?.let {
+                        getUserDate(it)
+                    }
+                }else{
+                    handleException(exception = it.exception,customMessage = "Login Failed")
+                }
+            }
+        }
+    }
+
     fun createOrUpdateProfile(name: String?=null, number: String?=null,imageurl : String?=null) {
         val uid = auth.currentUser?.uid
         val userData = com.gopal.letschat.data.UserData(

@@ -114,7 +114,7 @@ fun SignUpScreen(navController: NavController,vm : LCViewModel) {
                 )
                 Button(
                     onClick = {
-                        vm.signUp(nameState.text,numberState.text,emailState.text,passwordState.text)
+                        vm.signUp(name = nameState.text, number = numberState.text, email = emailState.text, password = passwordState.text)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF24a0ed), // Background color
@@ -127,7 +127,7 @@ fun SignUpScreen(navController: NavController,vm : LCViewModel) {
                 }
                 Text(
                     text = "Already have an Account",
-                    color = Color.Black,
+                    color = Color(0xFF2B48EA),
                     modifier = Modifier
                         .padding(3.dp)
                         .clickable {

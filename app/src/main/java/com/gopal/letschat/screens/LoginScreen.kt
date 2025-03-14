@@ -102,11 +102,11 @@ fun LoginScreen(navController: NavController, vm : LCViewModel) {
                 modifier = Modifier
                     .padding(10.dp)
             ) {
-                Text(text = "Log In",fontWeight = FontWeight.Bold)
+                Text(text = "LOG IN",fontWeight = FontWeight.Bold)
             }
             Text(
                 text = "New User? Create an Account",
-                color = Color.Black,
+                color = Color(0xFF2B48EA),
                 modifier = Modifier
                     .padding(3.dp)
                     .clickable {
