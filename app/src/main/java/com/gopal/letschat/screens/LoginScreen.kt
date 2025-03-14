@@ -93,7 +93,7 @@ fun LoginScreen(navController: NavController, vm : LCViewModel) {
             )
             Button(
                 onClick = {
-
+                    vm.logIn(emailState.text,passwordState.text)
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF24a0ed), // Background color
