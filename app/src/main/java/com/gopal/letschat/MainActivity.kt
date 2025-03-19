@@ -14,7 +14,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gopal.letschat.screens.ChatListScreen
 import com.gopal.letschat.screens.LoginScreen
+import com.gopal.letschat.screens.ProfileScreen
 import com.gopal.letschat.screens.SignUpScreen
+import com.gopal.letschat.screens.StatusScreen
 import com.gopal.letschat.ui.theme.LetsChatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -62,7 +64,13 @@ class MainActivity : ComponentActivity() {
                 LoginScreen(nav_controller,vm)
             }
             composable(DestinationScreen.ChatList.routes){
-                ChatListScreen()
+                ChatListScreen(nav_controller,vm)
+            }
+            composable(DestinationScreen.StatusList.routes){
+                StatusScreen()
+            }
+            composable(DestinationScreen.Profile.routes){
+                ProfileScreen()
             }
         }
     }
