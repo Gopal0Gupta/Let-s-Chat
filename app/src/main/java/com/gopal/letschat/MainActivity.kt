@@ -67,10 +67,10 @@ class MainActivity : ComponentActivity() {
                 ChatListScreen(nav_controller,vm)
             }
             composable(DestinationScreen.StatusList.routes){
-                StatusScreen()
+                StatusScreen(nav_controller,vm)
             }
             composable(DestinationScreen.Profile.routes){
-                ProfileScreen()
+                ProfileScreen(nav_controller,vm)
             }
         }
     }
