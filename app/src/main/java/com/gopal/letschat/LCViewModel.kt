@@ -1,5 +1,6 @@
 package com.gopal.letschat
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
@@ -8,17 +9,20 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.gopal.letschat.data.Event
 import com.gopal.letschat.data.UserData
 import com.gopal.letschat.data.user_node
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.Exception
 
 @HiltViewModel
 class LCViewModel @Inject constructor(
     val auth : FirebaseAuth,
-    val db: FirebaseFirestore
+    val db: FirebaseFirestore,
+    val storage: FirebaseStorage
 ) : ViewModel() {
 
     var inProcess by mutableStateOf(false)
@@ -78,6 +82,27 @@ class LCViewModel @Inject constructor(
                     handleException(exception = it.exception,customMessage = "Login Failed")
                 }
             }
+        }
+    }
+
+    fun uploadProfileImage(uri : Uri){
+        UploadImage(uri){
+            createOrUpdateProfile(imageurl = it.toString())
+        }
+    }
+
+    fun UploadImage(uri: Uri, onSuccess:(Uri)->Unit){
+        inProcess = true
+        val StorageRef = storage.reference
+        val uuid = UUID.randomUUID()
+        val imageRef = StorageRef.child("images/${uuid}")
+        val uploadTask = imageRef.putFile(uri)
+        uploadTask.addOnSuccessListener {
+            val result = it.metadata?.reference?.downloadUrl
+            result?.addOnSuccessListener(onSuccess)
+            inProcess = false
+        }.addOnFailureListener {
+            handleException(it)
         }
     }
 
