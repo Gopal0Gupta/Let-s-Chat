@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,8 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gopal.letschat.CommonDivider
 import com.gopal.letschat.CommonImage
+import com.gopal.letschat.DestinationScreen
 import com.gopal.letschat.LCViewModel
 import com.gopal.letschat.commonProgressBar
+import com.gopal.letschat.navigateTo
 
 @Composable
 fun ProfileScreen(navController: NavController, vm: LCViewModel) {
@@ -28,6 +31,13 @@ fun ProfileScreen(navController: NavController, vm: LCViewModel) {
     if (inProgress) {
         commonProgressBar()
     } else {
+        val userdata = vm.userdata
+        var name by rememberSaveable {
+            mutableStateOf(userdata?.name?:"")
+        }
+        var number by rememberSaveable {
+            mutableStateOf(userdata?.number?:"")
+        }
         Column {
             ProfileContent(
                 modifier = Modifier
@@ -39,9 +49,16 @@ fun ProfileScreen(navController: NavController, vm: LCViewModel) {
                 number = number,
                 onNameChange = { name = it },
                 onNumberChange = { number = it },
-                onSave = {},
-                onBack = {},
-                logOut = {}
+                onSave = {
+                    vm.createOrUpdateProfile(name = name,number=number)
+                },
+                onBack = {
+                    navigateTo(navController = navController,DestinationScreen.ChatList.routes)
+                },
+                logOut = {
+                    vm.Logout()
+                    navigateTo(navController = navController,DestinationScreen.Login.routes)
+                }
             )
             BottomNavigationMenu(BottomNavigationItem.PROFILE, navController)
         }

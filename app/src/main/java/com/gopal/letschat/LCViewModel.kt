@@ -120,6 +120,22 @@ class LCViewModel @Inject constructor(
             db.collection(user_node).document(uid).get().addOnSuccessListener {
                 if(it.exists()){
                     //updatedata
+                    db.collection(user_node).document(uid)
+                        .update(
+                            mapOf(
+                                "name" to userData.name,
+                                "number" to userData.number,
+                                "imageUrl" to userData.imageUrl
+                            )
+                        )
+                        .addOnSuccessListener {
+                            inProcess = false
+                            getUserDate(uid)
+                        }
+                        .addOnFailureListener {
+                            inProcess = false
+                            handleException(it, "Failed to update profile")
+                        }
                 }else{
                     db.collection(user_node).document(uid).set(userData)
                     inProcess = false
@@ -153,6 +169,12 @@ class LCViewModel @Inject constructor(
         val message = if (customMessage.isNullOrEmpty()) errormsg else customMessage
         eventmutablestate = Event(message)
         inProcess = false
+    }
+    fun Logout(){
+        auth.signOut()
+        signIn = false
+        userdata = null
+        eventmutablestate = Event("Logged Out")
     }
 }
 
