@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.gopal.letschat.data.ChatData
 import com.gopal.letschat.data.Event
 import com.gopal.letschat.data.UserData
 import com.gopal.letschat.data.user_node
@@ -26,9 +27,13 @@ class LCViewModel @Inject constructor(
 ) : ViewModel() {
 
     var inProcess by mutableStateOf(false)
+    var inProcessChats by mutableStateOf(false)
     var eventmutablestate by mutableStateOf<Event<String>?>(null)
     var signIn by mutableStateOf(false)
     var userdata by mutableStateOf<com.gopal.letschat.data.UserData?>(null)
+    val chats = mutableStateOf<List<ChatData>>(listOf())
+
+
     init {
         val currentuser = auth.currentUser
         signIn = currentuser != null
@@ -175,6 +180,10 @@ class LCViewModel @Inject constructor(
         signIn = false
         userdata = null
         eventmutablestate = Event("Logged Out")
+    }
+
+    fun onAddChat(it: String) {
+
     }
 }
 
