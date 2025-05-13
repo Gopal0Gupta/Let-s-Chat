@@ -6,11 +6,15 @@ import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.gopal.letschat.data.ChatData
+import com.gopal.letschat.data.Chats
 import com.gopal.letschat.data.Event
 import com.gopal.letschat.data.UserData
 import com.gopal.letschat.data.user_node
@@ -21,7 +25,7 @@ import kotlin.Exception
 
 @HiltViewModel
 class LCViewModel @Inject constructor(
-    val auth : FirebaseAuth,
+    val auth: FirebaseAuth,
     val db: FirebaseFirestore,
     val storage: FirebaseStorage
 ) : ViewModel() {
@@ -41,62 +45,63 @@ class LCViewModel @Inject constructor(
             getUserDate(it)
         }
     }
+
     fun signUp(
         name: String,
         number: String,
         email: String,
         password: String,
-    ){
+    ) {
         inProcess = true
-        if(name.isEmpty() or number.isEmpty() or email.isEmpty() or password.isEmpty()){
+        if (name.isEmpty() or number.isEmpty() or email.isEmpty() or password.isEmpty()) {
             handleException(customMessage = "Please Fill All Fields")
             return
         }
         inProcess = true
-        db.collection(user_node).whereEqualTo("number",number).get().addOnSuccessListener {
-            if(it.isEmpty){
+        db.collection(user_node).whereEqualTo("number", number).get().addOnSuccessListener {
+            if (it.isEmpty) {
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-                    if (it.isSuccessful){
+                    if (it.isSuccessful) {
                         signIn = true
-                        createOrUpdateProfile(name,number)
-                    }else{
+                        createOrUpdateProfile(name, number)
+                    } else {
                         handleException(it.exception, customMessage = "Sign Up Failed")
                     }
                 }
-            }else{
+            } else {
                 handleException(customMessage = "Number Already Exists")
                 inProcess = false
             }
         }
     }
 
-    fun logIn(email: String,password: String){
-        if(email.isEmpty() or password.isEmpty()){
+    fun logIn(email: String, password: String) {
+        if (email.isEmpty() or password.isEmpty()) {
             handleException(customMessage = "Please Fill All Fields")
             return
-        }else{
+        } else {
             inProcess = true
-            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
-                if(it.isSuccessful){
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
+                if (it.isSuccessful) {
                     signIn = true
                     inProcess = false
                     auth.currentUser?.uid?.let {
                         getUserDate(it)
                     }
-                }else{
-                    handleException(exception = it.exception,customMessage = "Login Failed")
+                } else {
+                    handleException(exception = it.exception, customMessage = "Login Failed")
                 }
             }
         }
     }
 
-    fun uploadProfileImage(uri : Uri){
-        UploadImage(uri){
+    fun uploadProfileImage(uri: Uri) {
+        UploadImage(uri) {
             createOrUpdateProfile(imageurl = it.toString())
         }
     }
 
-    fun UploadImage(uri: Uri, onSuccess:(Uri)->Unit){
+    fun UploadImage(uri: Uri, onSuccess: (Uri) -> Unit) {
         inProcess = true
         val StorageRef = storage.reference
         val uuid = UUID.randomUUID()
@@ -111,19 +116,23 @@ class LCViewModel @Inject constructor(
         }
     }
 
-    fun createOrUpdateProfile(name: String?=null, number: String?=null,imageurl : String?=null) {
+    fun createOrUpdateProfile(
+        name: String? = null,
+        number: String? = null,
+        imageurl: String? = null
+    ) {
         val uid = auth.currentUser?.uid
         val userData = com.gopal.letschat.data.UserData(
             userId = uid,
-            name = name?:userdata?.name,
-            number = number?:userdata?.number,
-            imageUrl = imageurl?:userdata?.imageUrl
+            name = name ?: userdata?.name,
+            number = number ?: userdata?.number,
+            imageUrl = imageurl ?: userdata?.imageUrl
         )
 
         uid?.let {
             inProcess = true
             db.collection(user_node).document(uid).get().addOnSuccessListener {
-                if(it.exists()){
+                if (it.exists()) {
                     //updatedata
                     db.collection(user_node).document(uid)
                         .update(
@@ -141,13 +150,13 @@ class LCViewModel @Inject constructor(
                             inProcess = false
                             handleException(it, "Failed to update profile")
                         }
-                }else{
+                } else {
                     db.collection(user_node).document(uid).set(userData)
                     inProcess = false
                     getUserDate(uid)
                 }
-            }.addOnFailureListener{
-                handleException(it,"Cannot Retrive User")
+            }.addOnFailureListener {
+                handleException(it, "Cannot Retrive User")
             }
         }
 
@@ -156,34 +165,65 @@ class LCViewModel @Inject constructor(
     private fun getUserDate(uid: String) {
         inProcess = true
         db.collection(user_node).document(uid).addSnapshotListener { value, error ->
-            if(error!=null){
-                handleException(error,"Cannot Retrive User")
+            if (error != null) {
+                handleException(error, "Cannot Retrive User")
             }
-            if (value!=null){
+            if (value != null) {
                 val user = value.toObject(UserData::class.java)
-                userdata=user
+                userdata = user
                 inProcess = false
             }
         }
     }
 
-    fun handleException(exception: Exception?=null,customMessage : String = ""){
-        Log.e("Let's Chat app","Let's Chat exception : ",exception)
+    fun handleException(exception: Exception? = null, customMessage: String = "") {
+        Log.e("Let's Chat app", "Let's Chat exception : ", exception)
         exception?.printStackTrace()
-        val errormsg = exception?.localizedMessage?:""
+        val errormsg = exception?.localizedMessage ?: ""
         val message = if (customMessage.isNullOrEmpty()) errormsg else customMessage
         eventmutablestate = Event(message)
         inProcess = false
     }
-    fun Logout(){
+
+    fun Logout() {
         auth.signOut()
         signIn = false
         userdata = null
         eventmutablestate = Event("Logged Out")
     }
 
-    fun onAddChat(it: String) {
-
+    fun onAddChat(number: String) {
+        if (number.isEmpty() or !number.isDigitsOnly()) {
+            handleException(customMessage = "Number Must Contain Digits Only")
+        } else {
+            db.collection(Chats).where(
+                Filter.or(
+                    Filter.and(
+                        Filter.equalTo("user1.number", number),
+                        Filter.equalTo("user2.number", userdata?.number)
+                    ),
+                    Filter.and(
+                        Filter.equalTo("user1.number", userdata?.number),
+                        Filter.equalTo("user2.number", number)
+                    )
+                )
+            ).get().addOnSuccessListener {
+                if (it.isEmpty) {
+                    db.collection(user_node).whereEqualTo("number", number).get()
+                        .addOnSuccessListener {
+                            if(it.isEmpty){
+                                if(it.isEmpty){
+                                    handleException(customMessage = "Number Not Found")
+                                }else{
+                                    val chatPartner = it.toObjects<UserData>()[0]
+                                }
+                            }
+                        }
+                } else {
+                    handleException(customMessage = "Chat Already Exists")
+                }
+            }
+        }
     }
 }
 
