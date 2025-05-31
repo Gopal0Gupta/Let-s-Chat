@@ -14,6 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.gopal.letschat.data.ChatData
+import com.gopal.letschat.data.ChatUser
 import com.gopal.letschat.data.Chats
 import com.gopal.letschat.data.Event
 import com.gopal.letschat.data.UserData
@@ -216,8 +217,17 @@ class LCViewModel @Inject constructor(
                                     handleException(customMessage = "Number Not Found")
                                 }else{
                                     val chatPartner = it.toObjects<UserData>()[0]
+                                    val id = db.collection(Chats).document().id
+                                    val chat = ChatData(
+                                        chatId = id,
+                                        ChatUser(userdata?.userId,userdata?.name,userdata?.imageUrl,userdata?.number),
+                                        ChatUser(chatPartner.userId,chatPartner.name,chatPartner.imageUrl,chatPartner.number)
+                                    )
+                                    db.collection(Chats).document(id).set(chat)
                                 }
                             }
+                        }.addOnFailureListener {
+                            handleException(it)
                         }
                 } else {
                     handleException(customMessage = "Chat Already Exists")
