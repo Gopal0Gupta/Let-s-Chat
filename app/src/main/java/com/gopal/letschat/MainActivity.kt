@@ -16,6 +16,7 @@ import com.gopal.letschat.screens.ChatListScreen
 import com.gopal.letschat.screens.LoginScreen
 import com.gopal.letschat.screens.ProfileScreen
 import com.gopal.letschat.screens.SignUpScreen
+import com.gopal.letschat.screens.SingleChatScreen
 import com.gopal.letschat.screens.StatusScreen
 import com.gopal.letschat.ui.theme.LetsChatTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -65,6 +66,12 @@ class MainActivity : ComponentActivity() {
             }
             composable(DestinationScreen.ChatList.routes){
                 ChatListScreen(nav_controller,vm)
+            }
+            composable(DestinationScreen.SingleChat.routes){
+                val chatId=it.arguments?.getString("chatId")
+                chatId?.let {
+                    SingleChatScreen(nav_controller,vm,chatId)
+                }
             }
             composable(DestinationScreen.StatusList.routes){
                 StatusScreen(nav_controller,vm)

@@ -3,6 +3,8 @@ package com.gopal.letschat
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import com.google.firebase.firestore.ktx.toObject
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -44,6 +46,27 @@ class LCViewModel @Inject constructor(
         signIn = currentuser != null
         currentuser?.uid?.let {
             getUserDate(it)
+        }
+    }
+
+    fun populateChats(){
+        inProcessChats = true
+        db.collection(Chats).where(
+            Filter.or(
+                Filter.equalTo("user1.userId",userdata?.userId),
+                Filter.equalTo("user2.userId",userdata?.userId),
+            )
+        ).addSnapshotListener{
+            value,error->
+            if (error!=null){
+                handleException(error)
+            }
+            if(value!=null){
+                chats.value = value.documents.mapNotNull {
+                    it.toObject<ChatData>()
+                }
+                inProcessChats = false
+            }
         }
     }
 
@@ -173,6 +196,7 @@ class LCViewModel @Inject constructor(
                 val user = value.toObject(UserData::class.java)
                 userdata = user
                 inProcess = false
+                populateChats()
             }
         }
     }
@@ -196,8 +220,9 @@ class LCViewModel @Inject constructor(
     fun onAddChat(number: String) {
         if (number.isEmpty() or !number.isDigitsOnly()) {
             handleException(customMessage = "Number Must Contain Digits Only")
-        } else {
-            db.collection(Chats).where(
+            return
+        }
+        db.collection(Chats).where(
                 Filter.or(
                     Filter.and(
                         Filter.equalTo("user1.number", number),
@@ -213,18 +238,16 @@ class LCViewModel @Inject constructor(
                     db.collection(user_node).whereEqualTo("number", number).get()
                         .addOnSuccessListener {
                             if(it.isEmpty){
-                                if(it.isEmpty){
-                                    handleException(customMessage = "Number Not Found")
-                                }else{
-                                    val chatPartner = it.toObjects<UserData>()[0]
-                                    val id = db.collection(Chats).document().id
-                                    val chat = ChatData(
-                                        chatId = id,
-                                        ChatUser(userdata?.userId,userdata?.name,userdata?.imageUrl,userdata?.number),
-                                        ChatUser(chatPartner.userId,chatPartner.name,chatPartner.imageUrl,chatPartner.number)
-                                    )
-                                    db.collection(Chats).document(id).set(chat)
-                                }
+                                handleException(customMessage = "Number Not Found")
+                            }else{
+                                val chatPartner = it.toObjects<UserData>()[0]
+                                val id = db.collection(Chats).document().id
+                                val chat = ChatData(
+                                    chatId = id,
+                                    ChatUser(userdata?.userId,userdata?.name,userdata?.imageUrl,userdata?.number),
+                                    ChatUser(chatPartner.userId,chatPartner.name,chatPartner.imageUrl,chatPartner.number)
+                                )
+                                db.collection(Chats).document(id).set(chat)
                             }
                         }.addOnFailureListener {
                             handleException(it)
@@ -233,7 +256,6 @@ class LCViewModel @Inject constructor(
                     handleException(customMessage = "Chat Already Exists")
                 }
             }
-        }
     }
 }
 

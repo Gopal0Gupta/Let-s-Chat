@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
@@ -29,9 +31,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gopal.letschat.DestinationScreen
 import com.gopal.letschat.LCViewModel
 import com.gopal.letschat.TitleText
 import com.gopal.letschat.commonProgressBar
+import com.gopal.letschat.commonRow
+import com.gopal.letschat.navigateTo
 
 @Composable
 fun ChatListScreen(navController: NavController, vm: LCViewModel) {
@@ -71,6 +76,22 @@ fun ChatListScreen(navController: NavController, vm: LCViewModel) {
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text("No Chats Available")
+                        }
+                    }else{
+                        LazyColumn(modifier = Modifier.weight(1f)) {
+                            items(chats){
+                                chat->
+                                val chatUser = if(chat.user1.userId==userData?.userId){
+                                    chat.user2
+                                }else{
+                                    chat.user1
+                                }
+                                commonRow(imageUrl = chatUser.imageUrl, name = chatUser.name) {
+                                    chat.chatId?.let {
+                                        navigateTo(navController,DestinationScreen.SingleChat.createRoute(Id =it))
+                                    }
+                                }
+                            }
                         }
                     }
                     BottomNavigationMenu(BottomNavigationItem.CHATLIST, navController)
