@@ -1,5 +1,6 @@
 package com.gopal.letschat
 
+import android.icu.util.Calendar
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -19,6 +20,8 @@ import com.gopal.letschat.data.ChatData
 import com.gopal.letschat.data.ChatUser
 import com.gopal.letschat.data.Chats
 import com.gopal.letschat.data.Event
+import com.gopal.letschat.data.MESSAGE
+import com.gopal.letschat.data.Message
 import com.gopal.letschat.data.UserData
 import com.gopal.letschat.data.user_node
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,6 +71,12 @@ class LCViewModel @Inject constructor(
                 inProcessChats = false
             }
         }
+    }
+
+    fun onSendReply(chatId:String,message:String){
+        var time = Calendar.getInstance().time.toString()
+        val msg = Message(chatId,message,time)
+        db.collection(Chats).document(chatId).collection(MESSAGE).document().set(msg)
     }
 
     fun signUp(
