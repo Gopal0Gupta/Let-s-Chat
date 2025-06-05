@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.gopal.letschat.data.ChatData
@@ -42,6 +43,9 @@ class LCViewModel @Inject constructor(
     var signIn by mutableStateOf(false)
     var userdata by mutableStateOf<com.gopal.letschat.data.UserData?>(null)
     val chats = mutableStateOf<List<ChatData>>(listOf())
+    var chatMessages by mutableStateOf<List<Message>>(listOf())
+    var inProgressChatMessage by mutableStateOf(false)
+    var currentChatMessageListener : ListenerRegistration? = null
 
 
     init {
@@ -50,6 +54,27 @@ class LCViewModel @Inject constructor(
         currentuser?.uid?.let {
             getUserDate(it)
         }
+    }
+
+    fun populateMessage(chatId: String){
+        inProgressChatMessage = true
+        currentChatMessageListener = db.collection(Chats).document(chatId).collection(MESSAGE).addSnapshotListener{
+            value , error ->
+            if(error!=null){
+                handleException(error)
+            }
+            if (value!=null){
+                chatMessages = value.documents.mapNotNull {
+                    it.toObject<Message>()
+                }.sortedBy { it.timestamp }
+                inProgressChatMessage = false
+            }
+        }
+    }
+
+    fun dePopulateMessage(){
+        chatMessages = listOf()
+        currentChatMessageListener = null
     }
 
     fun populateChats(){
