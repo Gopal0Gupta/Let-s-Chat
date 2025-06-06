@@ -100,7 +100,7 @@ class LCViewModel @Inject constructor(
 
     fun onSendReply(chatId:String,message:String){
         var time = Calendar.getInstance().time.toString()
-        val msg = Message(chatId,message,time)
+        val msg = Message(userdata?.userId,message,time)
         db.collection(Chats).document(chatId).collection(MESSAGE).document().set(msg)
     }
 

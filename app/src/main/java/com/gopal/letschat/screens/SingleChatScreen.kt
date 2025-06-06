@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,11 +38,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.gopal.letschat.CommonDivider
 import com.gopal.letschat.CommonImage
 import com.gopal.letschat.LCViewModel
 import com.gopal.letschat.data.Message
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun SingleChatScreen(navController: NavController, vm: LCViewModel, chatId: String) {
@@ -51,18 +56,19 @@ fun SingleChatScreen(navController: NavController, vm: LCViewModel, chatId: Stri
         vm.onSendReply(chatId, reply)
         reply = ""
     }
+    var chatMessages = vm.chatMessages
     val myuser = vm.userdata
     val currentChat = vm.chats.value.first { it.chatId == chatId }
     val chatUser =
         if (myuser?.userId == currentChat.user1.userId) currentChat.user2 else currentChat.user1
-    var chatMessages = vm.chatMessages
     LaunchedEffect(key1 = Unit) {
         vm.populateMessage(chatId)
     }
     BackHandler {
         vm.dePopulateMessage()
+        navController.popBackStack()
     }
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
         ChatHeader(name = chatUser.name ?: "Unknown User", imageUrl = chatUser.imageUrl ?: "") {
             navController.popBackStack()
             vm.dePopulateMessage()
@@ -70,7 +76,7 @@ fun SingleChatScreen(navController: NavController, vm: LCViewModel, chatId: Stri
         MessageBox(
             modifier = Modifier.weight(1f),
             chatMessage = chatMessages,
-            currentUserId = myuser?.userId ?: ""
+            currentUserId = myuser?.userId?: ""
         )
         ReplyBox(reply = reply, onReplyChange = { reply = it }, onSendReply = onSendReply)
     }
@@ -78,25 +84,44 @@ fun SingleChatScreen(navController: NavController, vm: LCViewModel, chatId: Stri
 
 @Composable
 fun MessageBox(modifier: Modifier, chatMessage: List<Message>, currentUserId: String) {
-    LazyColumn(modifier = Modifier) {
+    LazyColumn(modifier = modifier) {
         items(chatMessage) { msg ->
-            val allignment = if (msg.sendby == currentUserId) Alignment.End else Alignment.Start
-            val color = if (msg.sendby == currentUserId) Color(0xFF487246) else Color(0xFF414040)
+            val alignment = if (msg.sendby == currentUserId) Alignment.End else Alignment.Start
+            val backgroundColor = if (msg.sendby == currentUserId) Color(0xFF5B8148) else Color(0xFF5B5A5A)
+
+            val formattedTime = try {
+                val parser = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+                val formatter = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
+                val date = parser.parse(msg.timestamp ?: "")
+                if (date != null) formatter.format(date) else ""
+            } catch (e: Exception) {
+                ""
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalAlignment = allignment
+                    .padding(4.dp),
+                horizontalAlignment = alignment
             ) {
-                Text(
-                    text = msg.message ?: "",
+                Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(color)
-                        .padding(12.dp),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                        .background(backgroundColor)
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = msg.message ?: "",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = formattedTime,
+                        color = Color.LightGray,
+                        fontSize = 10.sp,
+                        modifier = Modifier.align(Alignment.End)
+                    )
+                }
             }
         }
     }
