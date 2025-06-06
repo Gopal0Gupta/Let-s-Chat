@@ -65,8 +65,8 @@ fun SingleChatScreen(navController: NavController, vm: LCViewModel, chatId: Stri
         vm.populateMessage(chatId)
     }
     BackHandler {
-        vm.dePopulateMessage()
         navController.popBackStack()
+        vm.dePopulateMessage()
     }
     Column(modifier = Modifier.fillMaxSize()) {
         ChatHeader(name = chatUser.name ?: "Unknown User", imageUrl = chatUser.imageUrl ?: "") {

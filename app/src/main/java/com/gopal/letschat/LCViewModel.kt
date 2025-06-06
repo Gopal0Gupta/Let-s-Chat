@@ -23,6 +23,7 @@ import com.gopal.letschat.data.Chats
 import com.gopal.letschat.data.Event
 import com.gopal.letschat.data.MESSAGE
 import com.gopal.letschat.data.Message
+import com.gopal.letschat.data.Status
 import com.gopal.letschat.data.UserData
 import com.gopal.letschat.data.user_node
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,7 +47,8 @@ class LCViewModel @Inject constructor(
     var chatMessages by mutableStateOf<List<Message>>(listOf())
     var inProgressChatMessage by mutableStateOf(false)
     var currentChatMessageListener : ListenerRegistration? = null
-
+    val status by mutableStateOf<List<Status>>(listOf())
+    val inProgressStatus by mutableStateOf(false)
 
     init {
         val currentuser = auth.currentUser
