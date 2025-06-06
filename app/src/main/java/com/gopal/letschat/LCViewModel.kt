@@ -248,6 +248,8 @@ class LCViewModel @Inject constructor(
         auth.signOut()
         signIn = false
         userdata = null
+        dePopulateMessage()
+        currentChatMessageListener = null
         eventmutablestate = Event("Logged Out")
     }
 
