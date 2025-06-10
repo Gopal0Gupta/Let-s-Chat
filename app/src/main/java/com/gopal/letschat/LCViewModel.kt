@@ -23,6 +23,7 @@ import com.gopal.letschat.data.Chats
 import com.gopal.letschat.data.Event
 import com.gopal.letschat.data.MESSAGE
 import com.gopal.letschat.data.Message
+import com.gopal.letschat.data.STATUS
 import com.gopal.letschat.data.Status
 import com.gopal.letschat.data.UserData
 import com.gopal.letschat.data.user_node
@@ -295,5 +296,26 @@ class LCViewModel @Inject constructor(
                 }
             }
     }
+
+    fun uploadStatus(uri: Uri) {
+        UploadImage(uri){
+            createStatus(it.toString())
+        }
+    }
+
+    fun createStatus(imageurl: String){
+        val newStatus = Status(
+            ChatUser(
+                userdata?.userId,
+                userdata?.name,
+                userdata?.imageUrl,
+                userdata?.number
+            ),
+            imageurl,
+            System.currentTimeMillis(),
+        )
+        db.collection(STATUS).document().set(newStatus)
+    }
+
 }
 

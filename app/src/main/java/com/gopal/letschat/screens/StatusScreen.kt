@@ -1,5 +1,8 @@
 package com.gopal.letschat.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,10 +46,16 @@ fun StatusScreen(navController: NavController, vm: LCViewModel) {
         val otherStatus = statuses.filter {
             it.user.userId != userData?.userId
         }
+        val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+            uri->
+            uri?.let {
+                vm.uploadStatus(uri)
+            }
+        }
         Scaffold(
             floatingActionButton = {
                 FAB {
-
+                    launcher.launch("image/*")
                 }
             },
             content = {
@@ -87,8 +96,8 @@ fun StatusScreen(navController: NavController, vm: LCViewModel) {
                                 }
                             }
                         }
-                        BottomNavigationMenu(BottomNavigationItem.STATUSLIST, navController)
                     }
+                    BottomNavigationMenu(BottomNavigationItem.STATUSLIST, navController)
                 }
             }
         )
