@@ -82,5 +82,5 @@ fun CommonProgressIndicator(modifier: Modifier, state: State, onComplete: () -> 
             finishedListener = { onComplete.invoke() })
         progress = p
     }
-    LinearProgressIndicator(modifier = Modifier, color = Color.Red, progress = progress)
+    LinearProgressIndicator(modifier = modifier, color = Color.Red, progress = progress)
 }
