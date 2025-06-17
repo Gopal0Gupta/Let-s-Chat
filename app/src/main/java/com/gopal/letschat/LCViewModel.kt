@@ -4,11 +4,13 @@ import android.icu.util.Calendar
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.Composable
 import com.google.firebase.firestore.ktx.toObject
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -48,8 +50,8 @@ class LCViewModel @Inject constructor(
     var chatMessages by mutableStateOf<List<Message>>(listOf())
     var inProgressChatMessage by mutableStateOf(false)
     var currentChatMessageListener : ListenerRegistration? = null
-    val status by mutableStateOf<List<Status>>(listOf())
-    val inProgressStatus by mutableStateOf(false)
+    var status by mutableStateOf<List<Status>>(listOf())
+    var inProgressStatus by mutableStateOf(false)
 
     init {
         val currentuser = auth.currentUser
@@ -234,6 +236,7 @@ class LCViewModel @Inject constructor(
                 userdata = user
                 inProcess = false
                 populateChats()
+                populateStatuses()
             }
         }
     }
@@ -317,5 +320,49 @@ class LCViewModel @Inject constructor(
         db.collection(STATUS).document().set(newStatus)
     }
 
+    fun populateStatuses(){
+        val timedelta = 24L*60*60*1000
+        val cutoff = System.currentTimeMillis()-timedelta
+        inProgressStatus = true
+        db.collection(Chats).where(
+            Filter.or(
+                Filter.equalTo("user1.userId",userdata?.userId),
+                Filter.equalTo("user2.userId",userdata?.userId)
+            )
+        ).addSnapshotListener {
+            value, error ->
+            if(error!=null){
+                handleException(error)
+                inProgressStatus = false
+            }
+            if(value!=null){
+                val conections = arrayListOf(userdata?.userId)
+                val chats = value.toObjects<ChatData>()
+                if (chats.isEmpty()) {
+                    inProgressStatus = false
+                    return@addSnapshotListener
+                }
+                chats.forEach{
+                    chat->
+                    if(chat.user1.userId== userdata?.userId){
+                        conections.add(chat.user2.userId)
+                    }else{
+                        conections.add(chat.user1.userId)
+                    }
+                    db.collection(STATUS).whereGreaterThan("timestamp",cutoff).whereIn("user.userId",conections).addSnapshotListener {
+                        value, error ->
+                        if(error!=null){
+                            handleException(error)
+                            inProgressStatus = false
+                        }
+                        if(value!=null){
+                            status = value.toObjects()
+                            inProgressStatus = false
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
