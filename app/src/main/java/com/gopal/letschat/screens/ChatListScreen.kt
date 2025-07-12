@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gopal.letschat.CommonDivider
 import com.gopal.letschat.DestinationScreen
 import com.gopal.letschat.LCViewModel
 import com.gopal.letschat.TitleText
@@ -69,6 +70,7 @@ fun ChatListScreen(navController: NavController, vm: LCViewModel) {
                     .fillMaxSize()
                     .padding(it)) {
                     TitleText(txt = "Chats")
+                    CommonDivider()
                     if (chats.isEmpty()) {
                         Column(
                             modifier = Modifier.fillMaxWidth().weight(1f),

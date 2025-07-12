@@ -65,6 +65,7 @@ fun StatusScreen(navController: NavController, vm: LCViewModel) {
                         .padding(it)
                 ) {
                     TitleText(txt = "Status")
+                    CommonDivider()
                     if (statuses.isEmpty()) {
                         Column(
                             modifier = Modifier
