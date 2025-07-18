@@ -6,7 +6,7 @@
 
 ## 📱 App Preview
 
-[![Watch the Demo](https://github.com/user-attachments/assets/b400eeeb-a072-4916-a751-6306318fa410)](https://youtube.com/shorts/ViI-2kaWcCI?feature=share)
+[![Watch the Demo](https://github.com/user-attachments/assets/b400eeeb-a072-4916-a751-6306318fa410)](https://youtube.com/shorts/Xu43uwr8qE8?feature=share)
 
 > 🔐 `Secure, Smooth & Stylish Messaging with Let's Chat`
 
